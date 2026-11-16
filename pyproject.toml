@@ -1,0 +1,14 @@
+[project]
+name = "xaer_wildcard_composer"
+description = "Multi-model ComfyUI wildcard prompt composer for Pony XL, Z-Image Turbo, and MiniMax H3 with interactive category containers and unique multi-character instancing."
+version = "2.3.0"
+license = { file = "LICENSE" }
+authors = [{ name = "Serelith-Varn" }]
+requires-python = ">=3.10"
+
+[project.urls]
+Repository = "https://github.com/Serelith-Varn/xaer_wildcard_composer"
+
+[tool.comfy]
+PublisherId = "Serelith-Varn"
+DisplayName = "Xaer Wildcard Composer"
