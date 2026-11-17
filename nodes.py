@@ -44,12 +44,19 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "version": "2.5.1",
     "character_master_file": CHARACTER_MASTER_FILE,
     "excluded_files": [
+        "armors.txt",
+        "xaer_actions.txt",
+        "xaer_char_archetype_clean.txt",
+        "xaer_eyecolor.txt",
+        "xaer_female_bottomwear.txt",
         "xaer_female_character01.txt",
         "xaer_female_character02.txt",
-        "xaer_char_archetype_clean.txt",
     ],
     "default_categories": {
         "prefix": [
+            "pony_glob_prefix.txt",
+            "zimage_glob_prefix.txt",
+            "minimaxh3_glob_prefix.txt",
             "prefix.txt",
             "xaer_prefix.txt",
         ],
@@ -80,7 +87,6 @@ DEFAULT_CONFIG: Dict[str, Any] = {
             "Calves.txt",
             "Ankles.txt",
             "Feet & Toes.txt",
-            "armors.txt",
             "xaer_outfit.txt",
             "xaer_clothes.txt",
             "xaer_female_topwear.txt",
@@ -96,6 +102,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
             "xaer_locations.txt",
         ],
         "suffix": [
+            "pony_glob_suffix.txt",
+            "zimage_glob_suffix.txt",
+            "minimaxh3_glob_suffix.txt",
             "suffix.txt",
             "xaer_suffix.txt",
         ],
@@ -104,7 +113,6 @@ DEFAULT_CONFIG: Dict[str, Any] = {
         "expression.txt",
         "eyecolor.txt",
         "hairstyle.txt",
-        "xaer_outfit.txt",
         "xaer_solo_actions.txt",
         "xaer_locations.txt",
     ],
@@ -112,10 +120,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
 }
 
 XAER_GOTHIC_NSFW_TAGS = (
-    "3::detailed, beautiful, gothic fantasy aesthetic, photo, photorealistic, "
-    "detailed skin texture, pores, beautiful dark fantasy illustration, detailed, "
-    "dramatic chiaroscuro lighting, perfect face, breasts exposed, groin exposed, "
-    "only women, 8k resolution, NSFW"
+    "detailed, beautiful, gothic fantasy aesthetic, photo, photorealistic, "
+    "detailed skin texture, pores, beautiful dark fantasy illustration, "
+    "dramatic chiaroscuro lighting, perfect face, only women, 8k resolution, NSFW"
 )
 
 PONY_QUALITY_PRESETS = [
@@ -366,7 +373,7 @@ def sanitize_line(
 
     line = FIELD_LABEL_PREFIX_RE.sub("", line).strip()
 
-    # Strip any "2::" or "5::" prefixes anywhere in the line
+    # Strip any "2::" or "5::" prefixes anywhere in the line (even glued after ")")
     line = re.sub(r"(?<![:\d.])\d+(?:\.\d+)?::", "", line).strip()
     # Fix incomplete trailing prepositions before weight colons, e.g. "of :1.15)" -> ":1.15)"
     line = re.sub(r"\bof\s*:(\d+(?:\.\d+)?)", r":\1", line)

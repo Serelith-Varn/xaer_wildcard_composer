@@ -1,0 +1,10 @@
+{simple_colors} tricorn leather hat
+Delicate metal crown
+Tiara
+{simple_colors} silk blindfold hood
+Sheer translucent {simple_colors} veil clipped to ear rings
+Bone or metal hairpins
+{simple_colors} silk hair ribbons
+Feathered {simple_colors} leather headstall
+Eye-concealing war {simple_colors} helm
+{simple_colors} Sheer gossamer coif drape

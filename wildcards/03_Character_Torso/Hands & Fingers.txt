@@ -1,0 +1,9 @@
+Fingerless {simple_colors} leather gloves
+Padded {simple_colors} leather paw-mitts with horn soles
+{simple_colors} leather-lined iron mittens
+Curved metal finger-claws
+Hand chains linked to wrist cuffs
+{simple_colors}-stone signet rings
+Handheld seal rods and tuning forks
+Articulated combat talon gauntlets
+simple_colors} Drake-hide crawling mitts

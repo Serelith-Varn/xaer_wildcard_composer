@@ -1,0 +1,34 @@
+female angel
+female asari
+female demon
+female dryad
+female elf
+female aasimar
+female air Genasi
+female eladrin
+female fairy
+female fey
+female giantess
+female gnome
+female goblin
+female half-elf
+female high elf
+female kalashtar
+female neko
+female kobold
+female krogan
+female merfolk
+female mermaid
+female minotaur
+female naga
+female nymph
+female orc
+female siren
+female spirit
+female succubus
+female tiefling
+female valkyrie
+female vampire
+female water genasi
+female wood elf
+female yuan-ti purebloods
