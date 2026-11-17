@@ -1,5 +1,4 @@
 import json
-import os
 import random
 import re
 from pathlib import Path
@@ -12,15 +11,9 @@ try:
 except ImportError:
     HAS_SERVER = False
 
-DEFAULT_WILDCARD_DIR = str(
-    Path(__file__).resolve().parent.parent
-    / "ComfyUI-Impact-Pack"
-    / "wildcards"
-    / "xaer_thalassor"
-)
-
-CONFIG_FILENAME = "node_config.json"
-CHARACTER_MASTER_FILE = "xaer_characters.txt"
+DEFAULT_WILDCARD_DIR = str(Path(__file__).resolve().parent / "wildcards")
+MANIFEST_FILENAME = "wildcards_manifest.json"
+CHARACTER_MASTER_REL_PATH = "00_Characters/xaer_characters.txt"
 
 CATEGORIES = ["prefix", "character", "action", "location", "suffix", "unassigned"]
 PROTECTED_BULK_CATEGORIES = {"prefix", "location", "suffix"}
@@ -28,6 +21,20 @@ PROTECTED_BULK_CATEGORIES = {"prefix", "location", "suffix"}
 NAMED_CHAR_CONFLICT_FILES = {
     "head.txt",
     "eyecolor.txt",
+}
+
+FOLDER_ROLE_DEFAULTS: Dict[str, Tuple[str, bool]] = {
+    "00_Characters": ("character_roster", True),
+    "01_Prefix": ("prefix", False),
+    "02_Character_Head": ("character", False),
+    "03_Character_Torso": ("character", False),
+    "04_Character_Lower_Body": ("character", False),
+    "05_Character_Wearables": ("character", False),
+    "06_Action": ("action", False),
+    "07_Location": ("location", False),
+    "08_Suffix": ("suffix", False),
+    "09_Unassigned": ("unassigned", False),
+    "_helpers": ("helper", True),
 }
 
 FIELD_LABEL_PREFIX_RE = re.compile(
@@ -39,85 +46,6 @@ FIELD_LABEL_PREFIX_RE = re.compile(
     r"Feet(?:\s*&\s*Toes)?|Archetypes?|Armors?|Outfits?)\s*:\s*",
     re.IGNORECASE,
 )
-
-DEFAULT_CONFIG: Dict[str, Any] = {
-    "version": "2.5.1",
-    "character_master_file": CHARACTER_MASTER_FILE,
-    "excluded_files": [
-        "armors.txt",
-        "xaer_actions.txt",
-        "xaer_char_archetype_clean.txt",
-        "xaer_eyecolor.txt",
-        "xaer_female_bottomwear.txt",
-        "xaer_female_character01.txt",
-        "xaer_female_character02.txt",
-    ],
-    "default_categories": {
-        "prefix": [
-            "pony_glob_prefix.txt",
-            "zimage_glob_prefix.txt",
-            "minimaxh3_glob_prefix.txt",
-            "prefix.txt",
-            "xaer_prefix.txt",
-        ],
-        "character": [
-            "head.txt",
-            "hairstyle.txt",
-            "xaer_hairstyle.txt",
-            "Ears.txt",
-            "eyeware.txt",
-            "eyecolor.txt",
-            "Nose.txt",
-            "Mouth.txt",
-            "expression.txt",
-            "Neck.txt",
-            "Shoulders.txt",
-            "Torso.txt",
-            "Back.txt",
-            "Waist & Midriff.txt",
-            "Arms (Full).txt",
-            "Upper Arms.txt",
-            "Forearms.txt",
-            "Wrists.txt",
-            "Hands & Fingers.txt",
-            "Pelvis.txt",
-            "Thighs.txt",
-            "Knees.txt",
-            "Legs.txt",
-            "Calves.txt",
-            "Ankles.txt",
-            "Feet & Toes.txt",
-            "xaer_outfit.txt",
-            "xaer_clothes.txt",
-            "xaer_female_topwear.txt",
-            "xaer_regalia.txt",
-            "naughty.txt",
-            "xaer_naughty.txt",
-        ],
-        "action": [
-            "xaer_solo_actions.txt",
-            "xaer_pair_actions.txt",
-        ],
-        "location": [
-            "xaer_locations.txt",
-        ],
-        "suffix": [
-            "pony_glob_suffix.txt",
-            "zimage_glob_suffix.txt",
-            "minimaxh3_glob_suffix.txt",
-            "suffix.txt",
-            "xaer_suffix.txt",
-        ],
-    },
-    "default_enabled": [
-        "expression.txt",
-        "eyecolor.txt",
-        "hairstyle.txt",
-        "xaer_solo_actions.txt",
-        "xaer_locations.txt",
-    ],
-    "node_layouts": {},
-}
 
 XAER_GOTHIC_NSFW_TAGS = (
     "detailed, beautiful, gothic fantasy aesthetic, photo, photorealistic, "
@@ -151,55 +79,12 @@ MINIMAX_CAMERA_PRESETS = [
 ]
 
 
-def load_or_init_config(wildcard_dir: str) -> Dict[str, Any]:
-    dir_path = Path(wildcard_dir)
-    config_path = dir_path / CONFIG_FILENAME
-    if not dir_path.exists():
-        return json.loads(json.dumps(DEFAULT_CONFIG))
-
-    if not config_path.exists():
-        try:
-            with open(config_path, "w", encoding="utf-8") as f:
-                json.dump(DEFAULT_CONFIG, f, indent=2, ensure_ascii=False)
-        except OSError:
-            pass
-        return json.loads(json.dumps(DEFAULT_CONFIG))
-
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            loaded = json.load(f)
-        merged = json.loads(json.dumps(DEFAULT_CONFIG))
-        merged.update(loaded)
-        excl = set(merged.get("excluded_files", []))
-        excl.update(DEFAULT_CONFIG["excluded_files"])
-        merged["excluded_files"] = sorted(excl)
-        return merged
-    except (OSError, json.JSONDecodeError):
-        return json.loads(json.dumps(DEFAULT_CONFIG))
-
-
-def save_config(wildcard_dir: str, config: Dict[str, Any]) -> bool:
-    dir_path = Path(wildcard_dir)
-    if not dir_path.exists():
-        return False
-    config_path = dir_path / CONFIG_FILENAME
-    try:
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
-        return True
-    except OSError:
-        return False
-
-
-def is_file_compatible_with_node(filename: str, target_node: str, config: Dict[str, Any]) -> bool:
+def is_file_compatible_with_node(filename: str, target_node: str) -> bool:
     lower = filename.lower()
     if not lower.endswith(".txt"):
         return False
-    if filename == config.get("character_master_file", CHARACTER_MASTER_FILE):
+    if lower in ("xaer_characters.txt", "placeholder.txt", "simple_colors.txt"):
         return False
-    if filename in config.get("excluded_files", []):
-        return False
-
     if lower.startswith("pony_"):
         return target_node == "pony"
     if lower.startswith("zimage_"):
@@ -209,77 +94,179 @@ def is_file_compatible_with_node(filename: str, target_node: str, config: Dict[s
     return True
 
 
-def infer_initial_category(filename: str, config: Dict[str, Any]) -> str:
-    lower = filename.lower()
-    if lower in ("simple_colors.txt", "xaer_simple_colors.txt"):
-        return "unassigned"
+def count_valid_lines(filepath: Path) -> int:
+    return len(read_wildcard_lines(filepath))
 
-    stripped = re.sub(r"^(pony|zimage|minimaxh3|all)_", "", lower)
-    if stripped.startswith(("prefix", "glob_prefix")):
-        return "prefix"
-    if stripped.startswith(("suffix", "glob_suffix")):
-        return "suffix"
-    if stripped.startswith(("loc_", "location", "glob_loc")):
-        return "location"
-    if stripped.startswith(("act_", "action")):
-        return "action"
 
-    default_cats = config.get("default_categories", {})
-    for cat in ["prefix", "character", "action", "location", "suffix"]:
-        if filename in default_cats.get(cat, []):
-            return cat
-    return "unassigned"
+def load_manifest(wildcard_dir: str) -> Dict[str, Any]:
+    dir_path = Path(wildcard_dir)
+    manifest_path = dir_path / MANIFEST_FILENAME
+    if manifest_path.is_file():
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict) and "node_layouts" in data:
+                return data
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {"version": "3.1.2", "node_layouts": {}}
+
+
+def save_manifest(wildcard_dir: str, manifest: Dict[str, Any]) -> bool:
+    dir_path = Path(wildcard_dir)
+    if not dir_path.exists():
+        return False
+    manifest_path = dir_path / MANIFEST_FILENAME
+    try:
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, ensure_ascii=False)
+        return True
+    except OSError:
+        return False
 
 
 def build_node_layout(wildcard_dir: str, target_node: str) -> Dict[str, List[Dict[str, Any]]]:
-    config = load_or_init_config(wildcard_dir)
     dir_path = Path(wildcard_dir)
     layout: Dict[str, List[Dict[str, Any]]] = {c: [] for c in CATEGORIES}
     if not dir_path.is_dir():
         return layout
 
-    available_files = [
-        f
-        for f in sorted(os.listdir(dir_path), key=lambda s: s.lower())
-        if (dir_path / f).is_file() and is_file_compatible_with_node(f, target_node, config)
-    ]
-    available_set = set(available_files)
+    manifest = load_manifest(wildcard_dir)
+    node_data = manifest.get("node_layouts", {}).get(target_node, {})
+    folders_map: Dict[str, Any] = node_data.get("folders", {})
 
-    saved_node_layout = config.get("node_layouts", {}).get(target_node)
-    placed_files = set()
+    # Index actual .txt files currently on disk by relative POSIX path
+    disk_files: Dict[str, Path] = {}
+    for p in sorted(dir_path.rglob("*.txt"), key=lambda x: x.as_posix().lower()):
+        if p.is_file():
+            rel = p.relative_to(dir_path).as_posix()
+            disk_files[rel] = p
 
-    if isinstance(saved_node_layout, dict):
-        for cat in CATEGORIES:
-            for item in saved_node_layout.get(cat, []):
-                fname = item.get("file", "")
-                if fname in available_set and fname not in placed_files:
-                    layout[cat].append({
-                        "file": fname,
-                        "enabled": bool(item.get("enabled", False)),
-                    })
-                    placed_files.add(fname)
+    seen_rel_paths = set()
 
-    default_enabled = set(config.get("default_enabled", []))
-    cat_order_map: Dict[str, List[str]] = config.get("default_categories", {})
+    # 1. Read structured folders from wildcards_manifest.json in defined order
+    for folder_name, folder_cfg in folders_map.items():
+        if not isinstance(folder_cfg, dict):
+            continue
+        role = str(folder_cfg.get("role", "unassigned")).lower()
+        hidden = bool(folder_cfg.get("hidden", False))
+        if hidden or role not in CATEGORIES:
+            for item in folder_cfg.get("files", []):
+                if isinstance(item, dict) and "rel_path" in item:
+                    seen_rel_paths.add(item["rel_path"])
+            continue
 
-    remaining = [f for f in available_files if f not in placed_files]
-    priority_index: Dict[str, int] = {}
-    idx_counter = 0
-    for cat in ["prefix", "character", "action", "location", "suffix"]:
-        for fname in cat_order_map.get(cat, []):
-            priority_index[fname] = idx_counter
-            idx_counter += 1
+        for item in folder_cfg.get("files", []):
+            if not isinstance(item, dict):
+                continue
+            rel_path = str(item.get("rel_path", ""))
+            fname = str(item.get("file", Path(rel_path).name))
+            if not rel_path:
+                rel_path = f"{folder_name}/{fname}" if folder_name else fname
 
-    remaining.sort(key=lambda f: (priority_index.get(f, 99999), f.lower()))
+            seen_rel_paths.add(rel_path)
+            if rel_path not in disk_files:
+                continue
+            if not is_file_compatible_with_node(fname, target_node):
+                continue
 
-    for fname in remaining:
-        cat = infer_initial_category(fname, config)
-        layout[cat].append({
+            layout[role].append({
+                "file": fname,
+                "rel_path": rel_path,
+                "folder": folder_name,
+                "enabled": bool(item.get("enabled", False)),
+            })
+
+    # 2. Pick up any newly added .txt files on disk not yet registered in the manifest
+    for rel_path, full_path in disk_files.items():
+        if rel_path in seen_rel_paths:
+            continue
+        fname = full_path.name
+        if not is_file_compatible_with_node(fname, target_node):
+            continue
+        top_folder = Path(rel_path).parts[0] if len(Path(rel_path).parts) > 1 else ""
+        role, hidden = FOLDER_ROLE_DEFAULTS.get(top_folder, ("unassigned", False))
+        if hidden or role not in CATEGORIES:
+            continue
+        layout[role].append({
             "file": fname,
-            "enabled": fname in default_enabled,
+            "rel_path": rel_path,
+            "folder": top_folder,
+            "enabled": False,
         })
 
     return layout
+
+
+def persist_category_layout_to_manifest(
+    wildcard_dir: str,
+    target_node: str,
+    category_layout: Dict[str, List[Dict[str, Any]]],
+) -> bool:
+    dir_path = Path(wildcard_dir)
+    manifest = load_manifest(wildcard_dir)
+    node_entry = manifest.setdefault("node_layouts", {}).setdefault(target_node, {"folders": {}})
+    folders = node_entry.setdefault("folders", {})
+
+    # Ensure standard folders exist in manifest
+    for folder_name, (role, hidden) in FOLDER_ROLE_DEFAULTS.items():
+        folders.setdefault(folder_name, {
+            "role": role,
+            "hidden": hidden,
+            "mode": "random",
+            "step_index": 0,
+            "files": [],
+        })
+
+    # Clear visible role file lists before rebuilding from UI state
+    for folder_name, f_cfg in folders.items():
+        if not f_cfg.get("hidden", False) and f_cfg.get("role") in CATEGORIES:
+            f_cfg["files"] = []
+
+    default_folder_for_role = {
+        "prefix": "01_Prefix",
+        "character": "02_Character_Head",
+        "action": "06_Action",
+        "location": "07_Location",
+        "suffix": "08_Suffix",
+        "unassigned": "09_Unassigned",
+    }
+
+    for role in CATEGORIES:
+        for item in category_layout.get(role, []):
+            fname = str(item.get("file", ""))
+            rel_path = str(item.get("rel_path", ""))
+            target_folder = str(item.get("folder", ""))
+
+            if not target_folder:
+                if "/" in rel_path:
+                    target_folder = rel_path.split("/", 1)[0]
+                else:
+                    target_folder = default_folder_for_role[role]
+
+            if target_folder not in folders:
+                folders[target_folder] = {
+                    "role": role,
+                    "hidden": False,
+                    "mode": "random",
+                    "step_index": 0,
+                    "files": [],
+                }
+            else:
+                folders[target_folder]["role"] = role
+
+            if not rel_path:
+                rel_path = f"{target_folder}/{fname}"
+
+            full_file = dir_path / rel_path
+            folders[target_folder]["files"].append({
+                "file": fname,
+                "rel_path": rel_path,
+                "enabled": bool(item.get("enabled", False)),
+                "line_count": count_valid_lines(full_file) if full_file.is_file() else 0,
+            })
+
+    return save_manifest(wildcard_dir, manifest)
 
 
 def read_wildcard_lines(filepath: Path) -> List[str]:
@@ -299,16 +286,26 @@ def read_wildcard_lines(filepath: Path) -> List[str]:
         return []
 
 
+def _find_wildcard_file(dir_path: Path, token: str) -> Optional[Path]:
+    fname = token if token.lower().endswith(".txt") else f"{token}.txt"
+    direct = dir_path / fname
+    if direct.is_file():
+        return direct
+    helper_path = dir_path / "_helpers" / fname
+    if helper_path.is_file():
+        return helper_path
+    for match in dir_path.rglob(fname):
+        if match.is_file():
+            return match
+    return None
+
+
 def resolve_dynamic_braces(
     text: str,
     rng: random.Random,
     dir_path: Optional[Path] = None,
     file_cache: Optional[Dict[str, List[str]]] = None,
 ) -> str:
-    """
-    Recursively resolves {wildcard_file} references (e.g., {simple_colors}),
-    {opt1|opt2|opt3} and (opt1|opt2|opt3) choice blocks, and {tag:1.35} weights.
-    """
     brace_pattern = re.compile(r"\{([^{}]*)\}")
     paren_choice_pattern = re.compile(r"\(([^()|]+\|[^()]+)\)")
     current = text
@@ -320,13 +317,14 @@ def resolve_dynamic_braces(
             if "|" in inner:
                 chosen = rng.choice(inner.split("|"))
             elif dir_path is not None and not re.search(r":\d+(?:\.\d+)?$", inner):
-                fname = inner if inner.lower().endswith(".txt") else f"{inner}.txt"
-                if file_cache is not None and fname not in file_cache:
-                    file_cache[fname] = read_wildcard_lines(dir_path / fname)
+                cache_key = inner.lower()
+                if file_cache is not None and cache_key not in file_cache:
+                    found = _find_wildcard_file(dir_path, inner)
+                    file_cache[cache_key] = read_wildcard_lines(found) if found else []
                 lines = (
-                    file_cache.get(fname, [])
+                    file_cache.get(cache_key, [])
                     if file_cache is not None
-                    else read_wildcard_lines(dir_path / fname)
+                    else (read_wildcard_lines(f) if (f := _find_wildcard_file(dir_path, inner)) else [])
                 )
                 chosen = rng.choice(lines) if lines else inner
             else:
@@ -372,10 +370,7 @@ def sanitize_line(
             line = rest.strip()
 
     line = FIELD_LABEL_PREFIX_RE.sub("", line).strip()
-
-    # Strip any "2::" or "5::" prefixes anywhere in the line (even glued after ")")
     line = re.sub(r"(?<![:\d.])\d+(?:\.\d+)?::", "", line).strip()
-    # Fix incomplete trailing prepositions before weight colons, e.g. "of :1.15)" -> ":1.15)"
     line = re.sub(r"\bof\s*:(\d+(?:\.\d+)?)", r":\1", line)
 
     def _unwrap_parens(match: re.Match) -> str:
@@ -391,11 +386,12 @@ def sanitize_line(
 
 
 def load_character_roster(wildcard_dir: str) -> Tuple[List[str], Dict[str, str]]:
-    config = load_or_init_config(wildcard_dir)
-    master_name = config.get("character_master_file", CHARACTER_MASTER_FILE)
-    filepath = Path(wildcard_dir) / master_name
-    lines = read_wildcard_lines(filepath)
+    dir_path = Path(wildcard_dir)
+    filepath = dir_path / CHARACTER_MASTER_REL_PATH
+    if not filepath.is_file():
+        filepath = dir_path / "xaer_characters.txt"
 
+    lines = read_wildcard_lines(filepath)
     options = ["Random (Unique)", "None"]
     roster_map: Dict[str, str] = {}
 
@@ -483,6 +479,12 @@ class _BaseXaerCategoryComposer:
         wildcard_bulk_override: str,
     ) -> Dict[str, List[Dict[str, Any]]]:
         fallback = build_node_layout(wildcard_dir, self.TARGET_NODE)
+        # Build lookup by filename in case an older workflow JSON lacks rel_path
+        rel_lookup: Dict[str, str] = {}
+        for entries in fallback.values():
+            for item in entries:
+                rel_lookup.setdefault(item["file"], item["rel_path"])
+
         result: Dict[str, List[Dict[str, Any]]] = fallback
 
         if category_layout_json and category_layout_json.strip():
@@ -492,9 +494,13 @@ class _BaseXaerCategoryComposer:
                     result = {c: [] for c in CATEGORIES}
                     for cat in CATEGORIES:
                         for entry in parsed.get(cat, []):
-                            if isinstance(entry, dict) and "file" in entry:
+                            if isinstance(entry, dict) and ("file" in entry or "rel_path" in entry):
+                                fname = str(entry.get("file") or Path(entry["rel_path"]).name)
+                                rel_path = str(entry.get("rel_path") or rel_lookup.get(fname, fname))
                                 result[cat].append({
-                                    "file": str(entry["file"]),
+                                    "file": fname,
+                                    "rel_path": rel_path,
+                                    "folder": str(entry.get("folder", "")),
                                     "enabled": bool(entry.get("enabled", False)),
                                 })
             except json.JSONDecodeError:
@@ -523,11 +529,16 @@ class _BaseXaerCategoryComposer:
             if not item.get("enabled"):
                 continue
             fname = item["file"]
+            rel_path = item.get("rel_path", fname)
             if skip_files and fname.lower() in skip_files:
                 continue
-            if fname not in file_cache:
-                file_cache[fname] = read_wildcard_lines(dir_path / fname)
-            lines = file_cache[fname]
+            if rel_path not in file_cache:
+                target_path = dir_path / rel_path
+                if not target_path.is_file():
+                    found = _find_wildcard_file(dir_path, fname)
+                    target_path = found if found else target_path
+                file_cache[rel_path] = read_wildcard_lines(target_path)
+            lines = file_cache[rel_path]
             if not lines:
                 continue
             raw_choice = rng.choice(lines)
@@ -723,7 +734,6 @@ class XaerPonyPromptComposer(_BaseXaerCategoryComposer):
             kwargs.get("custom_quality_tags", ""),
         )
 
-        # 1. Guarantee score_9, score_8_up, score_7_up is ALWAYS first in Pony XL
         score_tokens: List[str] = []
         remaining_q_tags: List[str] = []
         solo_conflict_re = re.compile(r"^(?:solo|1girl|1person)$", re.IGNORECASE)
@@ -743,7 +753,6 @@ class XaerPonyPromptComposer(_BaseXaerCategoryComposer):
         if not score_tokens:
             score_tokens = ["score_9", "score_8_up", "score_7_up"]
 
-        # 2. Auto-generate weighted count + multi-subject framing right after score tags
         count_tokens: List[str] = []
         if auto_girl_count_tag:
             if char_count == 1:
@@ -755,7 +764,6 @@ class XaerPonyPromptComposer(_BaseXaerCategoryComposer):
 
         prefix_parts = self._dedupe_tags(score_tokens + count_tokens + remaining_q_tags)
 
-        # 3. Character blocks separated by BREAK (always enforced for 2+ characters)
         char_blocks: List[str] = []
         for c in rolls["characters"]:
             c_tags: List[str] = []
@@ -766,7 +774,6 @@ class XaerPonyPromptComposer(_BaseXaerCategoryComposer):
             if c_tags:
                 char_blocks.append(", ".join(c_tags))
 
-        # 4. Global tail (Actions, Location, Suffix) isolated with BREAK
         tail_parts: List[str] = []
         tail_parts.extend(v for _, v in rolls["global_actions"])
         tail_parts.extend(v for _, v in rolls["location"])
@@ -953,9 +960,7 @@ if HAS_SERVER:
         wildcard_dir = data.get("wildcard_dir", DEFAULT_WILDCARD_DIR)
         target_node = data.get("target_node", "pony")
         layout = data.get("layout", {})
-        config = load_or_init_config(wildcard_dir)
-        config.setdefault("node_layouts", {})[target_node] = layout
-        ok = save_config(wildcard_dir, config)
+        ok = persist_category_layout_to_manifest(wildcard_dir, target_node, layout)
         return web.json_response({"status": "ok" if ok else "error"})
 
     @PromptServer.instance.routes.post("/xaer_composer/preview_prompt")
