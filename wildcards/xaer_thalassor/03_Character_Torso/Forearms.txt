@@ -1,6 +1,0 @@
-{simple_colors} eather forearm wraps
-{simple_colors} Leather forearm guards
-Riveted metal bracers
-Wrist-to-elbow shackles
-Subdermal {simple_colors} crystal nodes
-{simple_colors} Moonsteel bracers

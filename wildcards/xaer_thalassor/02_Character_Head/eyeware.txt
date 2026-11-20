@@ -1,8 +1,0 @@
-Single {simple_colors}crystal magnifying lens
-Hanging {simple_colors}crystal monocle suspended from ear ring
-{simple_colors} silk blindfold
-Transparent {simple_colors}-tinted glass blindfold
-{simple_colors} leather side-blinders
-Sheer {simple_colors}-tinted glass visor
-{simple_colors}Crystal scrying lens visor
-Brass-rimmed protective goggles with {simple_colors}-tinted lenses

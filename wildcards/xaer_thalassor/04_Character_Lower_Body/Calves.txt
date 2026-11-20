@@ -1,5 +1,0 @@
-Heavy {simple_colors} fur leg warmers
-Heavy {simple_colors} leather leg warmers
-Metal shin guards
-Short steel stride-chains
-{simple_colors} Moonsteel greaves
