@@ -14,8 +14,20 @@ except ImportError:
 DEFAULT_WILDCARD_DIR = str(Path(__file__).resolve().parent / "wildcards")
 MANIFEST_FILENAME = "wildcards_manifest.json"
 CHARACTER_MASTER_REL_PATH = "00_Characters/xaer_characters.txt"
-
-CATEGORIES = ["prefix", "character", "action", "location", "suffix", "unassigned"]
+CHARACTER_CATEGORIES = [
+    "character_head",
+    "character_torso",
+    "character_lower_body",
+    "character_wearables",
+]
+CATEGORIES = [
+    "prefix",
+    *CHARACTER_CATEGORIES,
+    "action",
+    "location",
+    "suffix",
+    "unassigned",
+]
 PROTECTED_BULK_CATEGORIES = {"prefix", "location", "suffix"}
 
 NAMED_CHAR_CONFLICT_FILES = {
@@ -26,10 +38,10 @@ NAMED_CHAR_CONFLICT_FILES = {
 FOLDER_ROLE_DEFAULTS: Dict[str, Tuple[str, bool]] = {
     "00_Characters": ("character_roster", True),
     "01_Prefix": ("prefix", False),
-    "02_Character_Head": ("character", False),
-    "03_Character_Torso": ("character", False),
-    "04_Character_Lower_Body": ("character", False),
-    "05_Character_Wearables": ("character", False),
+    "02_Character_Head": ("character_head", False),
+    "03_Character_Torso": ("character_torso", False),
+    "04_Character_Lower_Body": ("character_lower_body", False),
+    "05_Character_Wearables": ("character_wearables", False),
     "06_Action": ("action", False),
     "07_Location": ("location", False),
     "08_Suffix": ("suffix", False),
@@ -149,6 +161,8 @@ def build_node_layout(wildcard_dir: str, target_node: str) -> Dict[str, List[Dic
         if not isinstance(folder_cfg, dict):
             continue
         role = str(folder_cfg.get("role", "unassigned")).lower()
+        if role == "character" and folder_name in FOLDER_ROLE_DEFAULTS:
+            role = FOLDER_ROLE_DEFAULTS[folder_name][0]
         hidden = bool(folder_cfg.get("hidden", False))
         if hidden or role not in CATEGORIES:
             for item in folder_cfg.get("files", []):
@@ -225,7 +239,10 @@ def persist_category_layout_to_manifest(
 
     default_folder_for_role = {
         "prefix": "01_Prefix",
-        "character": "02_Character_Head",
+        "character_head": "02_Character_Head",
+        "character_torso": "03_Character_Torso",
+        "character_lower_body": "04_Character_Lower_Body",
+        "character_wearables": "05_Character_Wearables",
         "action": "06_Action",
         "location": "07_Location",
         "suffix": "08_Suffix",
@@ -503,6 +520,21 @@ class _BaseXaerCategoryComposer:
                                     "folder": str(entry.get("folder", "")),
                                     "enabled": bool(entry.get("enabled", False)),
                                 })
+                    # Migrate legacy flat "character" list from old saved workflows
+                    for entry in parsed.get("character", []):
+                        if isinstance(entry, dict) and ("file" in entry or "rel_path" in entry):
+                            fname = str(entry.get("file") or Path(entry["rel_path"]).name)
+                            rel_path = str(entry.get("rel_path") or rel_lookup.get(fname, fname))
+                            top_folder = rel_path.split("/", 1)[0] if "/" in rel_path else ""
+                            target_cat = FOLDER_ROLE_DEFAULTS.get(top_folder, ("character_head", False))[0]
+                            if target_cat not in CHARACTER_CATEGORIES:
+                                target_cat = "character_head"
+                            result[target_cat].append({
+                                "file": fname,
+                                "rel_path": rel_path,
+                                "folder": top_folder,
+                                "enabled": bool(entry.get("enabled", False)),
+                            })
             except json.JSONDecodeError:
                 result = fallback
 
@@ -612,9 +644,13 @@ class _BaseXaerCategoryComposer:
             )
             skip_set = NAMED_CHAR_CONFLICT_FILES if (prevent_named_char_collisions and is_named_character) else None
 
-            char_traits = self._sample_category_once(
-                rng, dir_path, layout.get("character", []), file_cache, skip_files=skip_set
-            )
+            char_traits: List[Tuple[str, str]] = []
+            for char_cat in CHARACTER_CATEGORIES:
+                char_traits.extend(
+                    self._sample_category_once(
+                        rng, dir_path, layout.get(char_cat, []), file_cache, skip_files=skip_set
+                    )
+                )
             char_actions: List[Tuple[str, str]] = []
             if action_scope == "per_character":
                 char_actions = self._sample_category_once(

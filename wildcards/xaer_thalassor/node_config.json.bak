@@ -1,0 +1,215 @@
+{
+  "version": "2.5.1",
+  "character_master_file": "xaer_characters.txt",
+  "excluded_files": [],
+  "default_categories": {
+    "prefix": [
+      "pony_glob_prefix.txt",
+      "zimage_glob_prefix.txt",
+      "minimaxh3_glob_prefix.txt"
+    ],
+    "character": [
+      "head.txt",
+      "hairstyle.txt",
+      "Ears.txt",
+      "eyeware.txt",
+      "eyecolor.txt",
+      "Nose.txt",
+      "Mouth.txt",
+      "expression.txt",
+      "Neck.txt",
+      "Shoulders.txt",
+      "Torso.txt",
+      "Back.txt",
+      "Waist & Midriff.txt",
+      "Arms (Full).txt",
+      "Upper Arms.txt",
+      "Forearms.txt",
+      "Wrists.txt",
+      "Hands & Fingers.txt",
+      "Pelvis.txt",
+      "Thighs.txt",
+      "Knees.txt",
+      "Legs.txt",
+      "Calves.txt",
+      "Ankles.txt",
+      "Feet & Toes.txt",
+      "naughty.txt"
+    ],
+    "action": [
+      "xaer_solo_actions.txt",
+      "xaer_pair_actions.txt",
+	  "xaer_group_actions.txt",
+    ],
+    "location": [
+      "xaer_locations.txt"
+    ],
+    "suffix": [
+      "pony_glob_suffix.txt",
+      "zimage_glob_suffix.txt",
+      "minimaxh3_glob_suffix.txt"
+    ]
+  },
+  "default_enabled": [
+    "pony_glob_prefix.txt",
+    "zimage_glob_prefix.txt",
+    "minimaxh3_glob_prefix.txt",
+    "hairstyle.txt",
+    "eyecolor.txt",
+    "expression.txt",
+    "Neck.txt",
+    "Shoulders.txt",
+    "Torso.txt",
+    "Forearms.txt",
+    "Hands & Fingers.txt",
+    "Thighs.txt",
+    "Legs.txt",
+    "Feet & Toes.txt",
+    "xaer_solo_actions.txt",
+    "xaer_locations.txt",
+    "pony_glob_suffix.txt",
+    "zimage_glob_suffix.txt",
+    "minimaxh3_glob_suffix.txt"
+  ],
+  "node_layouts": {
+    "pony": {
+      "prefix": [
+        { "file": "pony_glob_prefix.txt", "enabled": true }
+      ],
+      "character": [
+        { "file": "head.txt", "enabled": false },
+        { "file": "hairstyle.txt", "enabled": true },
+        { "file": "Ears.txt", "enabled": false },
+        { "file": "eyeware.txt", "enabled": false },
+        { "file": "eyecolor.txt", "enabled": true },
+        { "file": "Nose.txt", "enabled": false },
+        { "file": "Mouth.txt", "enabled": false },
+        { "file": "expression.txt", "enabled": true },
+        { "file": "Neck.txt", "enabled": true },
+        { "file": "Shoulders.txt", "enabled": true },
+        { "file": "Torso.txt", "enabled": true },
+        { "file": "Back.txt", "enabled": false },
+        { "file": "Waist & Midriff.txt", "enabled": false },
+        { "file": "Arms (Full).txt", "enabled": false },
+        { "file": "Upper Arms.txt", "enabled": false },
+        { "file": "Forearms.txt", "enabled": true },
+        { "file": "Wrists.txt", "enabled": false },
+        { "file": "Hands & Fingers.txt", "enabled": true },
+        { "file": "Pelvis.txt", "enabled": false },
+        { "file": "Thighs.txt", "enabled": true },
+        { "file": "Knees.txt", "enabled": false },
+        { "file": "Legs.txt", "enabled": true },
+        { "file": "Calves.txt", "enabled": false },
+        { "file": "Ankles.txt", "enabled": false },
+        { "file": "Feet & Toes.txt", "enabled": true },
+        { "file": "naughty.txt", "enabled": false }
+      ],
+      "action": [
+        { "file": "xaer_solo_actions.txt", "enabled": true },
+        { "file": "xaer_pair_actions.txt", "enabled": false },
+		{ "file": "xaer_group_actions.txt", "enabled": false }
+      ],
+      "location": [
+        { "file": "xaer_locations.txt", "enabled": true }
+      ],
+      "suffix": [
+        { "file": "pony_glob_suffix.txt", "enabled": true }
+      ],
+      "unassigned": [
+        { "file": "simple_colors.txt", "enabled": false }
+      ]
+    },
+    "zimage": {
+      "prefix": [
+        { "file": "zimage_glob_prefix.txt", "enabled": true }
+      ],
+      "character": [
+        { "file": "head.txt", "enabled": false },
+        { "file": "hairstyle.txt", "enabled": true },
+        { "file": "Ears.txt", "enabled": false },
+        { "file": "eyeware.txt", "enabled": false },
+        { "file": "eyecolor.txt", "enabled": true },
+        { "file": "Nose.txt", "enabled": false },
+        { "file": "Mouth.txt", "enabled": false },
+        { "file": "expression.txt", "enabled": true },
+        { "file": "Neck.txt", "enabled": true },
+        { "file": "Shoulders.txt", "enabled": true },
+        { "file": "Torso.txt", "enabled": true },
+        { "file": "Back.txt", "enabled": false },
+        { "file": "Waist & Midriff.txt", "enabled": false },
+        { "file": "Arms (Full).txt", "enabled": false },
+        { "file": "Upper Arms.txt", "enabled": false },
+        { "file": "Forearms.txt", "enabled": true },
+        { "file": "Wrists.txt", "enabled": false },
+        { "file": "Hands & Fingers.txt", "enabled": true },
+        { "file": "Pelvis.txt", "enabled": false },
+        { "file": "Thighs.txt", "enabled": true },
+        { "file": "Knees.txt", "enabled": false },
+        { "file": "Legs.txt", "enabled": true },
+        { "file": "Calves.txt", "enabled": false },
+        { "file": "Ankles.txt", "enabled": false },
+        { "file": "Feet & Toes.txt", "enabled": true },
+        { "file": "naughty.txt", "enabled": false }
+      ],
+      "action": [
+        { "file": "xaer_solo_actions.txt", "enabled": true },
+        { "file": "xaer_pair_actions.txt", "enabled": false }
+      ],
+      "location": [
+        { "file": "xaer_locations.txt", "enabled": true }
+      ],
+      "suffix": [
+        { "file": "zimage_glob_suffix.txt", "enabled": true }
+      ],
+      "unassigned": [
+        { "file": "simple_colors.txt", "enabled": false }
+      ]
+    },
+    "minimaxh3": {
+      "prefix": [
+        { "file": "minimaxh3_glob_prefix.txt", "enabled": true }
+      ],
+      "character": [
+        { "file": "head.txt", "enabled": false },
+        { "file": "hairstyle.txt", "enabled": true },
+        { "file": "Ears.txt", "enabled": false },
+        { "file": "eyeware.txt", "enabled": false },
+        { "file": "eyecolor.txt", "enabled": true },
+        { "file": "Nose.txt", "enabled": false },
+        { "file": "Mouth.txt", "enabled": false },
+        { "file": "expression.txt", "enabled": true },
+        { "file": "Neck.txt", "enabled": true },
+        { "file": "Shoulders.txt", "enabled": true },
+        { "file": "Torso.txt", "enabled": true },
+        { "file": "Back.txt", "enabled": false },
+        { "file": "Waist & Midriff.txt", "enabled": false },
+        { "file": "Arms (Full).txt", "enabled": false },
+        { "file": "Upper Arms.txt", "enabled": false },
+        { "file": "Forearms.txt", "enabled": true },
+        { "file": "Wrists.txt", "enabled": false },
+        { "file": "Hands & Fingers.txt", "enabled": true },
+        { "file": "Pelvis.txt", "enabled": false },
+        { "file": "Thighs.txt", "enabled": true },
+        { "file": "Knees.txt", "enabled": false },
+        { "file": "Legs.txt", "enabled": true },
+        { "file": "Calves.txt", "enabled": false },
+        { "file": "Ankles.txt", "enabled": false },
+        { "file": "Feet & Toes.txt", "enabled": true },
+        { "file": "naughty.txt", "enabled": false }
+      ],
+      "action": [
+        { "file": "xaer_solo_actions.txt", "enabled": true },
+        { "file": "xaer_pair_actions.txt", "enabled": false }
+      ],
+      "location": [
+        { "file": "xaer_locations.txt", "enabled": true }
+      ],
+      "suffix": [
+        { "file": "minimaxh3_glob_suffix.txt", "enabled": true }
+      ],
+      "unassigned": [
+        { "file": "simple_colors.txt", "enabled": false }
+      ]
+    }
+  }
+}

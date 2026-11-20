@@ -8,12 +8,15 @@ const TARGET_NODES = {
 };
 
 const CATEGORIES = [
-  { key: "prefix", label: "PREFIX" },
-  { key: "character", label: "CHARACTER (Per Subject)" },
-  { key: "action", label: "ACTION" },
-  { key: "location", label: "LOCATION" },
-  { key: "suffix", label: "SUFFIX" },
-  { key: "unassigned", label: "UNASSIGNED" },
+    { key: "prefix",               label: "PREFIX" },
+    { key: "character_head",       label: "CHARACTER HEAD (Per Subject)" },
+    { key: "character_torso",      label: "CHARACTER TORSO (Per Subject)" },
+    { key: "character_lower_body", label: "CHARACTER LOWER BODY (Per Subject)" },
+    { key: "character_wearables",  label: "CHARACTER WEARABLES (Per Subject)" },
+    { key: "action",               label: "ACTION" },
+    { key: "location",             label: "LOCATION" },
+    { key: "suffix",               label: "SUFFIX" },
+    { key: "unassigned",           label: "UNASSIGNED" },
 ];
 
 function emptyLayout() {
